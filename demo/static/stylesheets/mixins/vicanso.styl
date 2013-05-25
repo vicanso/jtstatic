@@ -1,0 +1,84 @@
+box-shadow(args...)
+  -webkit-box-shadow args
+  -moz-box-shadow args
+  box-shadow args
+
+user-select(args...)
+  -webkit-user-select args
+  -moz-user-select args
+  -ms-user-select args
+
+border-radius(args...)
+  -webkit-border-radius args
+  -moz-border-radius args
+  border-radius radius
+
+joinArgs(args)
+  str = ''
+  for arg, i in args
+    str += ', ' if i
+    str += arg
+  unquote(str)
+
+inlineBlock()
+  display inline-block
+  *display inline
+  *zoom inline
+
+
+vicansoGradient(start = #2c2c2c, end = #111)
+  background-image -webkit-gradient(linear, left top, left bottom, color-stop(0, start), color-stop(1, end))
+  background-image -webkit-linear-gradient(top, start 0%, end 100%)
+  background-image -moz-linear-gradient(top, start 0%, end 100%)
+  background-image -o-linear-gradient(top, start 0%, end 100%)
+  background-image -ms-linear-gradient(top, start 0%, end 100%)
+  background-image: linear-gradient(top, start 0%, end 100%)
+
+vicansoInsetBoxShadow(offset1 = 10px, color1 = rgba(255,255,255,0.20), args...)
+  if length(args) < 2
+    offset2 = 1px
+    color2 = rgba(255,255,255,0.10)
+  else
+    offset2 = args[0]
+    color2 = args[1]
+  box-shadow inset 0px 0px offset1 color1, inset 0px offset2 0px color2
+
+
+vicansoBoxShadow(offset1 = 10px, color1 = rgba(255,255,255,0.20))
+  box-shadow 0px 0px 0px offset1 color1
+
+vicansoBorderRadius(radius = 3px)
+  border-radius radius
+
+
+vicansoBtn(start, args...)
+  gradient = true
+  if length(args) == 2
+    fontColor = args[1]
+    end = args[0]
+  else
+    gradient = false
+    fontColor = args[0]
+  text-align center
+  padding 8px 10px
+  background-color rgb(start)
+  if gradient
+    vicansoGradient start, end
+  border 1px solid start
+  color fontColor
+  vicansoInsetBoxShadow()
+  vicansoBorderRadius()
+  text-shadow 0px -1px 0px rgba(0,0,0,0.20)
+
+
+vicansoListItem(bgColor, start, end, shadow)
+  padding 8px
+  background-color bgColor
+  vicansoGradient start, end
+  vicansoBoxShadow shadow
+  text-shadow: 0px -1px 0px #000;
+
+vicansoInlineBlock()
+  display inline-block
+  *display inline
+  *zoom 1

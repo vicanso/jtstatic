@@ -1,0 +1,16 @@
+!!!5
+html(lang='zh-CN')
+  head
+    meta(http-equiv='Content-Type', content='text/html; charset=UTF-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+    meta(name='keywords', content='javascript,node.js,WEB前端,jQuery,node')
+    meta(name='description', content='主要一些介绍node.js和web前端的技术blog，还包括其它一些server的软件')
+    meta(name='author',content='小墨鱼 vicanso 腻味 tree')
+    title= title
+    //CSS_FILES_CONTAINER
+    - fileImporter.importCss(['/stylesheets/global.styl', '/stylesheets/index.styl']);
+    - fileImporter.importJs(['javascripts/utils/underscore.min.js', 'javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']);
+  body
+    p 测试页面
+  - fileImporter.importJs(['/javascripts/buypage.coffee', '/javascripts/global.coffee', '/javascripts/item.coffee']);
+  //JS_FILES_CONTAINER
