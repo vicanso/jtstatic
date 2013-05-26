@@ -54,10 +54,6 @@ class FileImporter
       path = path.trim()
       if path.charAt(0) != '/'
         path = '/' + path
-      if !self.debug
-        mergerFile = fileMerger.getMergeFile path, type
-        if mergerFile
-          path = mergerFile
       if type == 'css'
         if !~_.indexOf self.cssFiles, path
           if prepend
@@ -74,6 +70,7 @@ class FileImporter
         path.reverse()
       _.each path, (item) ->
         self.importFiles item, type, prepend
+
     return self
   ###*
    * exportCss 输出CSS标签
@@ -103,36 +100,38 @@ class FileImporter
   ###
   _getExportFilesHTML : (files, type, debug, merge, host) ->
     self = @
-    exportAllFilesHTML = []
-    exportMergeFilesHTML = []
-    mergeFiles = []
+    resultFiles = []
     _.each files, (file) ->
-      isMerge = false
       if !self._isFilter file
         if debug && type == 'js'
           file = file.replace '.min.js', '.js'
-        if !fileMerger.isMergeByOthers file
-          mergeFiles.push path.join config.path, file
-          isMerge = true
-        # file = path.join config.staticPrefix, file
-      exportHTML = self._getExportHTML file, type, host
-      if !isMerge
-        exportMergeFilesHTML.push exportHTML
-      exportAllFilesHTML.push exportHTML
+        defineMergeList = fileMerger.getDefineMergeList file
+        if defineMergeList
+          resultFiles.push defineMergeList
+        else
+          resultFiles.push file
+      else
+        resultFiles.push file
+    resultFiles = _.compact resultFiles
+    otherFiles = []
 
-    if !merge || debug || mergeFiles.length == 0
-      return exportAllFilesHTML.join ''
-    linkFileName = fileMerger.mergeFilesToTemp mergeFiles, type
-    if linkFileName
+    mergeFile = (files) ->
+      linkFileName = fileMerger.mergeFilesToTemp files, type
       mergeUrlPrefix = config.mergeUrlPrefix
       if mergeUrlPrefix
         linkFileName = "#{mergeUrlPrefix}/#{linkFileName}"
-      # linkFileName = path.join config.tempStaticPrefix, linkFileName
-      exportHTML = self._getExportHTML linkFileName, type, host
-      exportMergeFilesHTML.push exportHTML
-      return exportMergeFilesHTML.join ''
-    else
-      return exportAllFilesHTML.join ''
+      self._getExportHTML linkFileName, type, host
+    htmlArr = _.map resultFiles, (result) ->
+      if _.isArray result
+        mergeFile result
+      else if merge
+        otherFiles.push result
+        ''
+      else
+        self._getExportHTML result, type, host
+    if otherFiles.length
+      htmlArr.push mergeFile otherFiles
+    htmlArr.join ''
 
   ###*
    * _isFilter 判断该文件是否应该过滤的

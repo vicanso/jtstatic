@@ -7,5 +7,6 @@ config =
   urlPrefix : ''
   version : ''
   mergePath : ''
+  mergeList : null
 
 module.exports = config

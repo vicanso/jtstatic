@@ -9,7 +9,8 @@
     mergePath: "" + __dirname + "/static/temp",
     mergeUrlPrefix: 'temp',
     maxAge: 300 * 1000,
-    version: Math.floor(Date.now())
+    version: Math.floor(Date.now()),
+    mergeList: [['/javascripts/utils/underscore.min.js', '/javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']]
   });
 
   jtStatic.emptyMergePath();
@@ -35,7 +36,9 @@
     }, function(err, html) {
       var css, js;
       css = fileImporter.exportCss(!debugMode);
+      console.dir(css);
       js = fileImporter.exportJs(!debugMode);
+      console.dir(js);
       html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace('<!--JS_FILES_CONTAINER-->', js);
       return res.end(html);
     });
