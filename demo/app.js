@@ -5,7 +5,7 @@
 
   jtStatic.configure({
     path: "" + __dirname + "/static",
-    urlPrefix: 'static',
+    urlPrefix: '/static',
     mergePath: "" + __dirname + "/static/temp",
     mergeUrlPrefix: 'temp',
     maxAge: 300 * 1000,
@@ -36,9 +36,7 @@
     }, function(err, html) {
       var css, js;
       css = fileImporter.exportCss(!debugMode);
-      console.dir(css);
       js = fileImporter.exportJs(!debugMode);
-      console.dir(js);
       html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace('<!--JS_FILES_CONTAINER-->', js);
       return res.end(html);
     });

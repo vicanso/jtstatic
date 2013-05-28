@@ -5,6 +5,9 @@ path = require 'path'
 
 staticHandler =
   handler : ->
+    maxAge = config.maxAge || 300 * 1000
+    if !config.isProductionMode
+      maxAge = 1
     handler = express.static "#{config.path}", {
       maxAge : config.maxAge || 300 * 1000
       redirect : false

@@ -19,7 +19,7 @@
     // 静态文件目录
     path: "" + __dirname + "/static",
     // 静态文件添加的URL前缀，用于app.use(mountpath, middleware)
-    urlPrefix: 'static',
+    urlPrefix: '/static',
     // 合并文件存放的目录
     mergePath: "" + __dirname + "/static/temp",
     // 合并文件的前缀（用于判断哪些请求是合并出来的文件）

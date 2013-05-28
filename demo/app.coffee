@@ -2,7 +2,7 @@ jtStatic = require '../index'
 
 jtStatic.configure 
   path : "#{__dirname}/static"
-  urlPrefix : 'static'
+  urlPrefix : '/static'
   mergePath : "#{__dirname}/static/temp"
   mergeUrlPrefix : 'temp'
   maxAge : 300 * 1000
@@ -31,9 +31,7 @@ app.get '/', (req, res) ->
     title : '测试标题'
   }, (err, html) ->
     css = fileImporter.exportCss !debugMode
-    console.dir css
     js = fileImporter.exportJs !debugMode
-    console.dir js
     html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace '<!--JS_FILES_CONTAINER-->', js
     res.end html
 app.listen 8080

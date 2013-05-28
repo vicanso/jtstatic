@@ -173,9 +173,7 @@ fileMerger =
         self.mergeFiles mergeFiles, saveFile, (data, file, saveFile) ->
           ext = path.extname file
           if ext == '.less' || ext == '.css' || ext == '.styl'
-            imagesPath = path.relative path.dirname(saveFile), path.dirname(file)
-            imagesPath = path.join imagesPath, '../images'
-            data = data.replace(/\s/g, '').replace /..\/images/g, imagesPath.replace /\\/g, '\/'
+            data = self._convertUrl data, file, saveFile
           else if ext == '.coffee' || ext == '.js'
             data += ';'
           return "/*#{path.basename(file)}*/#{data}\n"
@@ -188,5 +186,19 @@ fileMerger =
             # fileMergerEvent.emit 'complete', linkFileHash
 
     return linkFileName
-
+  _convertUrl : (data, file, saveFile) ->
+    imagesPath = path.relative path.dirname(saveFile), path.dirname(file)
+    reg = /url\(\"?\'?([\S]*?)\'?\"?\)/g
+    urlList = data.match reg
+    reg = /url\(\"?\'?([\S]*?)\'?\"?\)/
+    _.each urlList, (url) ->
+      result = reg.exec url
+      if result && result[1]
+        result = result[1]
+        if result.indexOf('data:') != 0
+          resultUrl = path.join(imagesPath, result).replace /\\/g, '\/'
+          resultUrl = url.replace result, resultUrl
+          if url != resultUrl
+            data = data.replace url, resultUrl
+    data.replace /\n/g, ''
 module.exports = fileMerger

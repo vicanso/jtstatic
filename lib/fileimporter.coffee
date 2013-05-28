@@ -52,7 +52,7 @@ class FileImporter
     self = @
     if _.isString path
       path = path.trim()
-      if path.charAt(0) != '/'
+      if path.charAt(0) != '/' && path.indexOf('http') != 0
         path = '/' + path
       if type == 'css'
         if !~_.indexOf self.cssFiles, path
@@ -112,7 +112,7 @@ class FileImporter
           resultFiles.push file
       else
         resultFiles.push file
-    resultFiles = _.compact resultFiles
+    resultFiles = _.uniq _.compact resultFiles
     otherFiles = []
 
     mergeFile = (files) ->
@@ -124,7 +124,7 @@ class FileImporter
     htmlArr = _.map resultFiles, (result) ->
       if _.isArray result
         mergeFile result
-      else if merge
+      else if merge && result.indexOf('http') != 0
         otherFiles.push result
         ''
       else
@@ -187,7 +187,7 @@ class FileImporter
     urlPrefix = config.urlPrefix
     if urlPrefix.charAt(0) != '/'
       urlPrefix = '/' + urlPrefix
-    if file.indexOf('http://') != 0
+    if file.indexOf('http') != 0
       if version
         file += "?version=#{version}"
       if file.charAt(0) != '/'
