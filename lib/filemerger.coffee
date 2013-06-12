@@ -12,7 +12,6 @@ crypto = require 'crypto'
 async = require 'async'
 parser = require './parser'
 
-tempFilesStatus = {}
 
 fileMerger = 
   ###*
@@ -149,7 +148,6 @@ fileMerger =
    * @return {String}            合并后的文件名
   ###
   mergeFilesToTemp : (mergeFiles, type) ->
-    self = @
     #已提前作合并的文件不再作合并
     # mergeFiles = _.filter mergeFiles, (file) ->
     #   return fileMerger.getMergeFile(file, type) == ''
@@ -163,28 +161,18 @@ fileMerger =
     linkFileName = "#{linkFileHash}.#{type}" 
 
     saveFile = path.join config.mergePath, linkFileName
-    # 判断该文件是否已成生成好，若生成好，HTML直接加载该文件
-    if tempFilesStatus[linkFileHash] == 'complete' || fs.existsSync saveFile
-      tempFilesStatus[linkFileHash] = 'complete'
-    else
-      # 判断是否该文件正在合并中，若正在合并，则直接返回空字符串。若不是，则调用合并，并在状态记录中标记为merging
-      if !tempFilesStatus[linkFileHash]
-        tempFilesStatus[linkFileHash] = 'merging'
-        self.mergeFiles mergeFiles, saveFile, (data, file, saveFile) ->
+    fs.exists saveFile, (exists) =>
+      if !exists
+        @mergeFiles mergeFiles, saveFile, (data, file, saveFile) =>
           ext = path.extname file
           if ext == '.less' || ext == '.css' || ext == '.styl'
-            data = self._convertUrl data, file, saveFile
+            data = @_convertUrl data, file, saveFile
           else if ext == '.coffee' || ext == '.js'
             data += ';'
           return "/*#{path.basename(file)}*/#{data}\n"
         ,(err) ->
           if err
-            delete tempFilesStatus[linkFileHash]
             console.error err
-          else
-            tempFilesStatus[linkFileHash] = 'complete'
-            # fileMergerEvent.emit 'complete', linkFileHash
-
     return linkFileName
   _convertUrl : (data, file, saveFile) ->
     imagesPath = path.relative path.dirname(saveFile), path.dirname(file)
@@ -195,7 +183,7 @@ fileMerger =
       result = reg.exec url
       if result && result[1]
         result = result[1]
-        if result.indexOf('data:') != 0
+        if result.indexOf 'data:'
           resultUrl = path.join(imagesPath, result).replace /\\/g, '\/'
           resultUrl = url.replace result, resultUrl
           if url != resultUrl

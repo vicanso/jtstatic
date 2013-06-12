@@ -16,9 +16,10 @@
   jtStatic = {
     FileImporter: FileImporter,
     "static": staticHandler.handler,
-    emptyMergePath: function() {
-      var mergePath;
-      mergePath = config.mergePath;
+    emptyMergePath: function(mergePath) {
+      if (mergePath == null) {
+        mergePath = config.mergePath;
+      }
       return fs.readdir(mergePath, function(err, files) {
         return _.each(files, function(file) {
           return fs.unlink(path.join(mergePath, file), function() {});

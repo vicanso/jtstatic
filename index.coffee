@@ -10,8 +10,7 @@ path = require 'path'
 jtStatic = 
   FileImporter : FileImporter
   static : staticHandler.handler
-  emptyMergePath : ->
-    mergePath = config.mergePath
+  emptyMergePath : (mergePath = config.mergePath) ->
     fs.readdir mergePath, (err, files) ->
       _.each files, (file) ->
         fs.unlink path.join(mergePath, file), ->

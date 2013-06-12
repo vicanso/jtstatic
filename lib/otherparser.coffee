@@ -43,7 +43,8 @@ otherParser =
             else
               buf = new Buffer data, encoding
               res.header 'Content-Length' , buf.length
-              return end.call res, buf
+              write.call res, buf
+              end.call res
       next()
 
 ###*
