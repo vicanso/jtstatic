@@ -26,7 +26,7 @@
     mergeUrlPrefix: 'temp',
     // 设置静态文件的maxAge单位ms
     maxAge: 300 * 1000,
-    // 静态文件URL带的版本哪，?version=xxxx，可以不传
+    // 静态文件URL带的版本号，?version=xxxx，可以不传
     version: Math.floor(Date.now())
   });
   //清空静态文件合并的目录
@@ -99,7 +99,7 @@ html(lang='zh-CN')
 - hosts 静态文件的host列表，如果不传该参数，使用当前的host（在production使用该参数，为了提升网站加载速度，如果不清楚其原因，google一下就有）
 
 ```js
-var fileImporter = jtStatic.FileImporter(false);
+var fileImporter = new jtStatic.FileImporter(false);
 ```
 
 <a name="importFile" />

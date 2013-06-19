@@ -32,7 +32,11 @@ parser =
    * @return {parser}
   ###
   parseCoffee : (data, minifyOptions, cbf) ->
-    jsStr = coffeeScript.compile data
+    try
+      jsStr = coffeeScript.compile data
+    catch err
+      cbf err
+      return
     if _.isFunction minifyOptions
       cbf = minifyOptions
       minifyOptions = null

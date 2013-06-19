@@ -39,7 +39,9 @@ otherParser =
           file = path.join staticPath, pathname
           handle file, buf.toString(encoding), (err, data) ->
             if err
-              throw err
+              console.error err
+              if !config.isProductionMode
+                throw err
             else
               buf = new Buffer data, encoding
               res.header 'Content-Length' , buf.length

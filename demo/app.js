@@ -38,7 +38,7 @@
       css = fileImporter.exportCss(!debugMode);
       js = fileImporter.exportJs(!debugMode);
       html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace('<!--JS_FILES_CONTAINER-->', js);
-      return res.end(html);
+      return res.send(html);
     });
   });
 

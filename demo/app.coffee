@@ -24,8 +24,8 @@ app.use '/static', jtStatic.static()
 app.get '/', (req, res) ->
   debugMode = false
   hosts = ['http://test1.com', 'http://test2.com']
+  # fileImporter = new jtStatic.FileImporter debugMode, hosts
   fileImporter = new jtStatic.FileImporter debugMode
-  # fileImporter.importJs('aojfoej');
   res.render 'index', {
     fileImporter : fileImporter
     title : '测试标题'
@@ -33,5 +33,5 @@ app.get '/', (req, res) ->
     css = fileImporter.exportCss !debugMode
     js = fileImporter.exportJs !debugMode
     html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace '<!--JS_FILES_CONTAINER-->', js
-    res.end html
+    res.send html
 app.listen 8080

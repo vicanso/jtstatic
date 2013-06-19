@@ -8,30 +8,11 @@ path = require 'path'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
 config = require './config'
-crypto = require 'crypto'
 async = require 'async'
 parser = require './parser'
 
 
 fileMerger = 
-  ###*
-   * getMergeFile 根据当前文件返回合并对应的文件名，若该文件未被合并，则返回空字符串
-   * @param  {String} file 当前文件
-   * @param  {String} type 文件类型（css, js）
-   * @return {String} 返回合并后的文件名
-  ###
-  # getMergeFile : (file, type) ->
-  #   self = @
-  #   mergeFile = ''
-  #   if type is 'css'
-  #     searchFiles = self.cssList
-  #   else
-  #     searchFiles = self.jsList
-  #   _.each searchFiles, (searchInfo) ->
-  #     files = searchInfo.files
-  #     if !mergeFile && (_.indexOf files, file, true) != -1
-  #       mergeFile = searchInfo.name
-  #   return mergeFile
   getDefineMergeList : (file) ->
     mergeList = config.mergeList
     result = null
@@ -39,45 +20,6 @@ fileMerger =
       result = _.find mergeList, (item) ->
         ~_.indexOf item, file
     result
-
-  ###*
-   * isMergeByOthers 该文件是否是由其它文件合并而来
-   * @param  {String}  file 文件名
-   * @return {Boolean}      [description]
-  ###
-  # isMergeByOthers : (file) ->
-  #   self = @
-  #   files = _.pluck(self.cssList, 'name').concat _.pluck self.jsList, 'name'
-  #   return _.indexOf(files, file) != -1
-  ###*
-   * mergeFilesBeforeRunning 合并文件(在程序运行之前，主要是把一些公共的文件合并成一个，减少HTTP请求)
-   * @param  {Boolean} merging 是否真实作读取文件合并的操作（由于有可能有多个worker进程，因此只需要主进程作真正的读取，合并操作，其它的只需要整理合并列表）
-   * @param {Array} mergeFiles 合并文件列表
-   * @return {[type]}              [description]
-  ###
-  # mergeFilesBeforeRunning : (merging, mergeFiles) ->
-  #   self = @
-  #   _.each mergeFiles, (mergerInfo, mergerType) ->
-  #     if _.isArray mergerInfo
-  #       mergeList = []
-  #       _.each mergerInfo, (mergers) ->
-  #         mergeList.push mergers
-  #       if merging
-  #         _.each mergeList, (mergers) ->
-  #           saveFile = path.join config.path, mergers.name
-  #           content = []
-  #           _.each mergers.files, (file, i) ->
-  #             content .push fs.readFileSync path.join(config.path, file), 'utf8'
-  #           mkdirp path.dirname(saveFile), (err) ->
-  #             if err
-  #               console.error err
-  #             fileSplit = ''
-  #             if mergerType == 'js'
-  #               fileSplit = ';'
-  #             fs.writeFileSync saveFile, content.join fileSplit
-  #           mergers.files.sort()
-  #       self["#{mergerType}List"] = mergeList
-  #   return self
   ###*
    * mergeFiles 合并文件
    * @param  {Array} files 需要合并的文件列表

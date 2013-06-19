@@ -7,9 +7,9 @@ staticHandler =
   handler : ->
     maxAge = config.maxAge || 300 * 1000
     if !config.isProductionMode
-      maxAge = 1
+      maxAge = 0
     handler = express.static "#{config.path}", {
-      maxAge : config.maxAge || 300 * 1000
+      maxAge : maxAge
       redirect : false
     }
     otherParser = require('./otherparser').parser config.path
@@ -52,8 +52,7 @@ mergeFileHandle = (file, cbf) ->
       else
         count++
         GLOBAL.setTimeout cbf, 50
-  , (err) ->
-    cbf()
+  , cbf
 
 
 module.exports = staticHandler

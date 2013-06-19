@@ -4,7 +4,6 @@
 ###
 
 _ = require 'underscore'
-path = require 'path'
 fs = require 'fs'
 
 config = require './config'
@@ -14,80 +13,77 @@ class FileImporter
   ###*
    * constructor 文件引入类
    * @param  {Boolean} debug 是否debug模式，debug模式下将.min.js替换为.js
-   * @param  {String} host 静态文件的host
+   * @param  {String} hosts 静态文件的hosts
    * @return {FileImporter}       [description]
   ###
-  constructor : (debug, @host) ->
+  constructor : (@debug = false, @hosts) ->
     @cssFiles = []
     @jsFiles = []
-    @debug = debug || false
+    if @hosts && !_.isArray @hosts
+      @hosts = [@hosts]
   ###*
    * importCss 引入css文件
-   * @param  {String} path     css路径
+   * @param  {String} file     css路径
    * @param  {Boolean} {optioanl} prepend 是否插入到数组最前（在HTML中首先输出）
    * @return {FileImporter}         [description]
   ###
-  importCss : (path, prepend) ->
-    self = @
-    self.importFiles path, 'css', prepend
-    return self
+  importCss : (file, prepend) ->
+    @importFiles file, 'css', prepend
+    @
   ###*
    * importJs 引入js文件
-   * @param  {String} path    js路径
+   * @param  {String} file    js路径
    * @param  {Boolean} {optioanl} prepend [是否插入到数组最前（在HTML中首先输出）]
    * @return {FileImporter}         [description]
   ###
-  importJs : (path, prepend) ->
-    self = @
-    self.importFiles path, 'js', prepend
-    return self
+  importJs : (file, prepend) ->
+    @importFiles file, 'js', prepend
+    @
   ###*
    * importFiles 引入文件
-   * @param  {String} path    文件路径
+   * @param  {String} file    文件路径
    * @param  {String} type    文件类型(css, js)
    * @param  {Boolean} {optioanl} prepend 是否插入到数组最前（在HTML中首先输出）
    * @return {FileImporter}         [description]
   ###
-  importFiles : (path, type, prepend) ->
-    self = @
-    if _.isString path
-      path = path.trim()
-      if path.charAt(0) != '/' && path.indexOf('http') != 0
-        path = '/' + path
+  importFiles : (file, type, prepend) ->
+    cssFiles = @cssFiles
+    jsFiles = @jsFiles
+    if _.isString file
+      file = file.trim()
+      if file.charAt(0) != '/' && !@_isFilter file
+        file = '/' + file
       if type == 'css'
-        if !~_.indexOf self.cssFiles, path
+        if !~_.indexOf cssFiles, file
           if prepend
-            self.cssFiles.unshift path
+            cssFiles.unshift file
           else
-            self.cssFiles.push path
-      else if !~_.indexOf self.jsFiles, path
+            cssFiles.push file
+      else if !~_.indexOf jsFiles, file
         if prepend
-          self.jsFiles.unshift path
+          jsFiles.unshift file
         else
-          self.jsFiles.push path
-    else if _.isArray path
+          jsFiles.push file
+    else if _.isArray file
       if prepend
-        path.reverse()
-      _.each path, (item) ->
-        self.importFiles item, type, prepend
-
-    return self
+        file.reverse()
+      _.each file, (item) =>
+        @importFiles item, type, prepend
+    @
   ###*
    * exportCss 输出CSS标签
    * @param  {Boolean} merge 是否合并css文件
    * @return {String} 返回css标签
   ###
   exportCss : (merge) ->
-    self = @
-    return @_getExportFilesHTML self.cssFiles, 'css', self.debug, merge, @host
+    @_getExportFilesHTML @cssFiles, 'css', @debug, merge, @hosts
   ###*
    * exportJs 输出JS标签
    * @param  {Boolean} merge 是否合并js文件
    * @return {String} 返回js标签
   ###
   exportJs : (merge) ->
-    self = @
-    return @_getExportFilesHTML self.jsFiles, 'js', self.debug, merge, @host
+    @_getExportFilesHTML @jsFiles, 'js', @debug, merge, @hosts
 
   ###*
    * _getExportFilesHTML 获取引入文件列表对应的HTML
@@ -95,14 +91,13 @@ class FileImporter
    * @param  {String} type  引入文件类型，现支持css, js
    * @param  {Boolean} debug 是否debug模式
    * @param  {Boolean} merge 是否需要合并文件
-   * @param  {String} host 静态文件的host
+   * @param  {String} hosts 静态文件的host
    * @return {String} 返回html标签内容
   ###
-  _getExportFilesHTML : (files, type, debug, merge, host) ->
-    self = @
+  _getExportFilesHTML : (files, type, debug, merge, hosts) ->
     resultFiles = []
-    _.each files, (file) ->
-      if !self._isFilter file
+    _.each files, (file) =>
+      if !@_isFilter file
         if debug && type == 'js'
           file = file.replace '.min.js', '.js'
         defineMergeList = fileMerger.getDefineMergeList file
@@ -115,20 +110,20 @@ class FileImporter
     resultFiles = _.uniq _.compact resultFiles
     otherFiles = []
 
-    mergeFile = (files) ->
+    mergeFile = (files) =>
       linkFileName = fileMerger.mergeFilesToTemp files, type
       mergeUrlPrefix = config.mergeUrlPrefix
       if mergeUrlPrefix
         linkFileName = "#{mergeUrlPrefix}/#{linkFileName}"
-      self._getExportHTML linkFileName, type, host
-    htmlArr = _.map resultFiles, (result) ->
+      @_getExportHTML linkFileName, type, hosts
+    htmlArr = _.map resultFiles, (result) =>
       if _.isArray result
         mergeFile result
-      else if merge && result.indexOf('http') != 0
+      else if merge && !@_isFilter result
         otherFiles.push result
         ''
       else
-        self._getExportHTML result, type, host
+        @_getExportHTML result, type, hosts
     if otherFiles.length
       htmlArr.push mergeFile otherFiles
     htmlArr.join ''
@@ -139,24 +134,22 @@ class FileImporter
    * @return {Boolean}      [description]
   ###
   _isFilter : (file) ->
-    filterPrefix = 'http'
-    if file.substring(0, filterPrefix.length) == filterPrefix
-      return true
+    if file.substring(0, 7) == 'http://' || file.substring(0, 8) == 'https://'
+      true
     else
-      return false
-
+      false
   ###*
    * _getExportHTML 返回生成的HTML
    * @param  {String} file   引入的文件
    * @param  {String} type   文件类型
-   * @param  {String} host 静态文件的host
+   * @param  {String} hosts 静态文件的host
    * @return {String} 返回相应的html
   ###
-  _getExportHTML : (file, type, host) ->
+  _getExportHTML : (file, type, hosts) ->
     html = ''
     switch type
-      when 'js' then html = @_exportJsHTML file, host
-      else html = @_exportCssHTML file, host
+      when 'js' then html = @_exportJsHTML file, hosts
+      else html = @_exportCssHTML file, hosts
     return html
 
   ###*
@@ -164,42 +157,39 @@ class FileImporter
    * @param  {String} file   引入的文件
    * @return {String} 返回相应的html
   ###
-  _exportJsHTML : (file, host) ->
-    url = @_getUrl file, host
-    return '<script type="text/javascript" src="' + url + '"></script>'
+  _exportJsHTML : (file, hosts) ->
+    url = @_getUrl file, hosts
+    '<script type="text/javascript" src="' + url + '"></script>'
 
   ###*
    * _exportCssHTML 返回引入CSS标签的HTML
    * @param  {String} file   引入的文件
    * @return {String} 返回相应的html
   ###
-  _exportCssHTML : (file, host) ->
-    url = @_getUrl file, host
-    return '<link rel="stylesheet" href="' + url + '" type="text/css" />'
+  _exportCssHTML : (file, hosts) ->
+    url = @_getUrl file, hosts
+    '<link rel="stylesheet" href="' + url + '" type="text/css" />'
   ###*
    * _getUrl 获取引用文件的URL
    * @param  {String} file 文件路径
-   * @param  {String, Array} host 文件域名
+   * @param  {String, Array} hosts 文件域名
    * @return {[type]}      [description]
   ###
-  _getUrl : (file, host) ->
+  _getUrl : (file, hosts) ->
     version = config.version
     urlPrefix = config.urlPrefix
     if urlPrefix.charAt(0) != '/'
       urlPrefix = '/' + urlPrefix
-    if file.indexOf('http') != 0
+    if !@_isFilter file
       if version
         file += "?version=#{version}"
       if file.charAt(0) != '/'
         file = '/' + file
       if urlPrefix
         file = "#{urlPrefix}#{file}"
-      if host
-        if _.isArray host
-          index = Math.floor Math.random() * host.length
-          file = host[index] + file
-        else
-          file = host + file
+      if hosts
+        index = file.length % hosts.length
+        file = hosts[index] + file
     file
 
 
