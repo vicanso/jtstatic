@@ -5,7 +5,7 @@ staticHandler = require './lib/static'
 config = require './lib/config'
 fs = require 'fs'
 path = require 'path'
-
+parser = require './lib/parser'
 
 jtStatic = 
   FileImporter : FileImporter
@@ -19,5 +19,8 @@ jtStatic =
       _.extend config, key
     else
       config[key] = value
+  addParser : parser.add
+  convertExts : (exts) ->
+    FileImporter.convertExts = exts
 
 module.exports = jtStatic

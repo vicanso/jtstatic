@@ -27,10 +27,16 @@
     // 设置静态文件的maxAge单位ms
     maxAge: 300 * 1000,
     // 静态文件URL带的版本号，?version=xxxx，可以不传
-    version: Math.floor(Date.now())
+    version: Math.floor(Date.now() / 1000),
+    // 固定的合并文件（主要是将一些通用的文件合并）
+    mergeList: [['/javascripts/utils/underscore.min.js', '/javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']]
   });
   //清空静态文件合并的目录
   jtStatic.emptyMergePath();
+
+  jtStatic.addParser('.sass', 'text/css', function(file, data, cbf) {
+    return cbf(null, sass.render(data));
+  });
 
   express = require('express');
 
@@ -43,20 +49,19 @@
   app.use('/static', jtStatic["static"]());
 
   app.get('/', function(req, res) {
-    var debugMode, fileImporter, hosts;
-    debugMode = false;
+    var  fileImporter, hosts;
     hosts = ['http://test1.com', 'http://test2.com'];
-    // 用于在模板中引入文件类
-    fileImporter = new jtStatic.FileImporter(debugMode);
+    //用于在模板中引入文件
+    fileImporter = new jtStatic.FileImporter();
     return res.render('index', {
       fileImporter: fileImporter,
       title: '测试标题'
     }, function(err, html) {
       var css, js;
-      css = fileImporter.exportCss(!debugMode);
-      js = fileImporter.exportJs(!debugMode);
+      css = fileImporter.exportCss(false);
+      js = fileImporter.exportJs(false);
       html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace('<!--JS_FILES_CONTAINER-->', js);
-      return res.end(html);
+      return res.send(html);
     });
   });
 
@@ -85,21 +90,68 @@ html(lang='zh-CN')
 ```
 
 ##API
-
-- [FileImporter] (#FileImporter)
+- [jtStatic.static] (#static)
+- [jtStatic.emptyMergePath] (#emptyMergePath)
+- [jtStatic.addParser] (#addParser)
+- [jtStatic.convertExts] (#convertExts)
+- [jtStatic.FileImporter] (#FileImporter)
 - [FileImporter.importCss FileImporter.importJs] (#importFile)
 - [FileImporter.exportCss FileImporter.exportJs] (#exportFile)
+
+<a name="static" />
+## static
+### 返回用于express中的middleware
+
+```js
+app.use('/static', jtStatic["static"]());
+```
+
+<a name="emptyMergePath" />
+## emptyMergePath
+### 清空存储合并文件的临时目录
+
+```js
+jtStatic.emptyMergePath();
+```
+
+<a name="addParser" />
+## addParser
+### 添加其它类型文件的处理函数
+
+### 参数列表
+- ext 文件后缀
+- mimeType http的mime类型
+- handler 处理的回调函数，参数为[file, data, cbf]
+
+```js
+jtStatic.addParser('.sass', 'text/css', function(file, data, cbf) {
+  return cbf(null, sass.render(data));
+});
+```
+<a name="convertExts" />
+## convertExts
+### 添加引入过程中需要转换的文件后缀对
+
+### 参数列表
+- convertExts 指定在引入过程中，将哪些文件的后缀转换成其它后缀（主要是为了开始中使用非.min版本的js，在production环境中使用.min版本的，当然也可用于在开始中使用.styl，在production使用其对应的.css），若不需要转换则不传该值
+
+```js
+jtStatic.convertExts({
+  src: ['.min.js'],
+  dst: ['.js']
+});
+```
+
 
 <a name="FileImporter" />
 ## FileImporter
 ### 返回引入类的实例，用于在模板中引入静态文件
 
 ### 参数列表
-- debugMode 是否debug模式，在该模式下，引入的xxx.min.js会替换为引入xxx.js
 - hosts 静态文件的host列表，如果不传该参数，使用当前的host（在production使用该参数，为了提升网站加载速度，如果不清楚其原因，google一下就有）
 
 ```js
-var fileImporter = new jtStatic.FileImporter(false);
+var fileImporter = new jtStatic.FileImporter();
 ```
 
 <a name="importFile" />

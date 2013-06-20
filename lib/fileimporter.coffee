@@ -12,11 +12,10 @@ fileMerger = require './filemerger'
 class FileImporter
   ###*
    * constructor 文件引入类
-   * @param  {Boolean} debug 是否debug模式，debug模式下将.min.js替换为.js
    * @param  {String} hosts 静态文件的hosts
    * @return {FileImporter}       [description]
   ###
-  constructor : (@debug = false, @hosts) ->
+  constructor : (@host) ->
     @cssFiles = []
     @jsFiles = []
     if @hosts && !_.isArray @hosts
@@ -76,30 +75,30 @@ class FileImporter
    * @return {String} 返回css标签
   ###
   exportCss : (merge) ->
-    @_getExportFilesHTML @cssFiles, 'css', @debug, merge, @hosts
+    @_getExportFilesHTML @cssFiles, 'css', merge, @hosts
   ###*
    * exportJs 输出JS标签
    * @param  {Boolean} merge 是否合并js文件
    * @return {String} 返回js标签
   ###
   exportJs : (merge) ->
-    @_getExportFilesHTML @jsFiles, 'js', @debug, merge, @hosts
+    @_getExportFilesHTML @jsFiles, 'js', merge, @hosts
 
   ###*
    * _getExportFilesHTML 获取引入文件列表对应的HTML
    * @param  {Array} files 引入文件列表
    * @param  {String} type  引入文件类型，现支持css, js
-   * @param  {Boolean} debug 是否debug模式
    * @param  {Boolean} merge 是否需要合并文件
    * @param  {String} hosts 静态文件的host
    * @return {String} 返回html标签内容
   ###
-  _getExportFilesHTML : (files, type, debug, merge, hosts) ->
+  _getExportFilesHTML : (files, type, merge, hosts) ->
     resultFiles = []
     _.each files, (file) =>
       if !@_isFilter file
-        if debug && type == 'js'
-          file = file.replace '.min.js', '.js'
+        file = @_convertExt file
+        # if debug && type == 'js'
+        #   file = file.replace '.min.js', '.js'
         defineMergeList = fileMerger.getDefineMergeList file
         if defineMergeList
           resultFiles.push defineMergeList
@@ -191,6 +190,17 @@ class FileImporter
         index = file.length % hosts.length
         file = hosts[index] + file
     file
-
-
+  _convertExt : (file) ->
+    convertExts = FileImporter.convertExts
+    if convertExts?.src && convertExts.dst
+      dstExt = -1
+      srcExt = _.find convertExts.src, (ext, i) ->
+        if ext == file.substring file.length - ext.length
+          dstExt = convertExts.dst[i]
+          true
+        else
+          false
+      if srcExt && dstExt
+        file = file.substring(0, file.length - srcExt.length) + dstExt
+    file
 module.exports = FileImporter

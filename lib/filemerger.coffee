@@ -41,35 +41,12 @@ fileMerger =
             data = dataConvert data, file, saveFile
           cbf err, data
         ext = path.extname file
-        switch ext
-          when '.less' 
-          then handle = _.wrap handle, (func, err, data) ->
-              if err
-                func err, data
-              else
-                options = 
-                  paths : [path.dirname file]
-                  compress : true
-                parser.parseLess data, options, func
-          when '.styl'
-          then handle = _.wrap handle, (func, err, data) ->
-              if err
-                func err, data
-              else
-                options = 
-                  paths : [path.dirname file]
-                  filename : file
-                  compress : true
-                parser.parseStylus data, options, func
-          when '.coffee'
-          then handle = _.wrap handle, (func, err, data) ->
-              if err
-                func err, data
-              else
-                options = 
-                  fromString : true
-                  warnings : true
-                parser.parseCoffee data, options, func
+        if ~_.indexOf parser.getParseExts(), ext
+          handle = _.wrap handle, (func, err, data) ->
+            if err
+              func err, data
+            else
+              parser.parse file, data, func
         fs.readFile file, 'utf8', handle
           
     async.parallel funcs, (err, results) ->

@@ -3,6 +3,12 @@ less = require 'less'
 coffeeScript = require 'coffee-script'
 stylus = require 'stylus'
 uglifyJS = require 'uglify-js'
+path = require 'path'
+config = require './config'
+express = require 'express'
+express.mime.types['less'] = 'text/css'
+express.mime.types['styl'] = 'text/css'
+express.mime.types['coffee'] = 'application/javascript'
 parser = 
   ###*
    * parseLess 编译less
@@ -56,4 +62,67 @@ parser =
     stylus.render data, options, cbf
     return @
 
-module.exports = parser
+parserHandler = 
+  parseExts : ['.less', '.coffee', '.styl']
+  ###*
+   * less less编译
+   * @param  {String} file 文件名
+   * @param  {String} data 文件数据
+   * @param  {Function} cbf  回调函数
+   * @return {[type]}      [description]
+  ###
+  less : (file, data, cbf) ->
+    options = 
+      paths : [path.dirname file]
+      filename : file
+    if config.isProductionMode
+      options.compress = true
+    parser.parseLess data, options, cbf
+
+  ###*
+   * coffee coffee编译
+   * @param  {String} file 文件名
+   * @param  {String} data 文件数据
+   * @param  {Function} cbf 回调函数
+   * @return {[type]}      [description]
+  ###
+  coffee : (file, data, cbf) ->
+    if config.isProductionMode
+      options = 
+        fromString : true
+        warnings : true
+    parser.parseCoffee data, options, (err, jsStr) ->
+      if err
+        err.file = file
+      cbf err, jsStr
+  ###*
+   * styl stylus编译
+   * @param  {String} file 文件名
+   * @param  {String} data 文件数据
+   * @param  {Function} cbf 回调函数
+   * @return {[type]}      [description]
+  ###
+  styl : (file, data, cbf) ->
+    options = 
+      filename : file
+    if config.isProductionMode
+      options.compress = true
+    parser.parseStylus data, options, cbf
+
+module.exports = 
+  parse : (file, data, cbf) ->
+    ext = path.extname file
+    handler = parserHandler[ext.substring 1]
+    if _.isFunction handler
+      handler file, data, cbf
+    else
+      err = new Error
+      err.msg = "Not support the file type #{ext}"
+      cbf err
+  add : (ext, mimeType, handler) ->
+    parserHandler.parseExts.push ext
+    type = ext.substring 1
+    parserHandler[type] = handler
+    express.mime.types[type] = mimeType
+  getParseExts : ->
+    parserHandler.parseExts

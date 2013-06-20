@@ -1,5 +1,5 @@
 (function() {
-  var FileImporter, config, fs, jtStatic, path, staticHandler, _;
+  var FileImporter, config, fs, jtStatic, parser, path, staticHandler, _;
 
   _ = require('underscore');
 
@@ -12,6 +12,8 @@
   fs = require('fs');
 
   path = require('path');
+
+  parser = require('./lib/parser');
 
   jtStatic = {
     FileImporter: FileImporter,
@@ -32,6 +34,10 @@
       } else {
         return config[key] = value;
       }
+    },
+    addParser: parser.add,
+    convertExts: function(exts) {
+      return FileImporter.convertExts = exts;
     }
   };
 
