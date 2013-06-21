@@ -1,12 +1,9 @@
 
 path = require 'path'
-jtUtil = require 'jtutil'
 _ = require 'underscore'
 fs = require 'fs'
 config = require './config'
 parser = require './parser'
-
-
 
 otherParser = 
   ###*

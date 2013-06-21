@@ -190,6 +190,11 @@ class FileImporter
         index = file.length % hosts.length
         file = hosts[index] + file
     file
+  ###*
+   * _convertExt 转换文件后缀
+   * @param  {[type]} file [description]
+   * @return {[type]}      [description]
+  ###
   _convertExt : (file) ->
     convertExts = FileImporter.convertExts
     if convertExts?.src && convertExts.dst

@@ -12,7 +12,12 @@ async = require 'async'
 parser = require './parser'
 
 
-fileMerger = 
+fileMerger =
+  ###*
+   * getDefineMergeList 获取已定义合并的文件（如果不是已定义合并的文件，返回null）
+   * @param  {[type]} file [description]
+   * @return {[type]}      [description]
+  ###
   getDefineMergeList : (file) ->
     mergeList = config.mergeList
     result = null

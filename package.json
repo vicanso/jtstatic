@@ -1,0 +1,28 @@
+{
+  "name": "jtstatic",
+  "description": "static file handler for node,",
+  "version": "0.0.1",
+  "author": {
+    "name": "Vicanso 小墨鱼",
+    "email": "vicansocanbico@gmail.com"
+  },
+  "dependencies": {
+    "underscore": "latest",
+    "async" : "latest",
+    "mkdirp": "latest",
+    "coffee-script": "latest",
+    "stylus": "latest",
+    "uglify-js": "latest",
+    "less": "latest",
+    "express": "3.x"
+  },
+  "keywords": [
+    "static"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vicanso/jtstatic.git"
+  },
+  "main": "index",
+  "readmeFilename": "README.md"
+}

@@ -133,7 +133,7 @@ jtStatic.addParser('.sass', 'text/css', function(file, data, cbf) {
 ### 添加引入过程中需要转换的文件后缀对
 
 ### 参数列表
-- convertExts 指定在引入过程中，将哪些文件的后缀转换成其它后缀（主要是为了开始中使用非.min版本的js，在production环境中使用.min版本的，当然也可用于在开始中使用.styl，在production使用其对应的.css），若不需要转换则不传该值
+- convertExts 指定在引入过程中，将哪些文件的后缀转换成其它后缀（主要是为了开发环境中使用非.min版本的js，在production环境中使用.min版本的，当然也可用于在开发环境中使用.styl，在production使用其对应的.css），若不需要转换则不传该值
 
 ```js
 jtStatic.convertExts({
