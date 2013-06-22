@@ -50,7 +50,7 @@ parser =
       minifyCode = uglifyJS.minify jsStr, minifyOptions
       jsStr = minifyCode.code
     cbf null, jsStr
-    return @
+    @
   ###*
    * parseStylus 编译stylus
    * @param  {String} data stylus内容
