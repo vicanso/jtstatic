@@ -1,9 +1,9 @@
 {
   "name": "jtstatic",
-  "description": "static file handler for node,",
+  "description": "static file handler for node",
   "version": "0.0.1",
   "author": {
-    "name": "Vicanso 小墨鱼",
+    "name": "vicanso 小墨鱼",
     "email": "vicansocanbico@gmail.com"
   },
   "dependencies": {

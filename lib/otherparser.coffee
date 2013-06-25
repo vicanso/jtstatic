@@ -18,7 +18,7 @@ otherParser =
       pathname = url.parse(req.url).pathname
       ext = path.extname pathname
       isNotMin = jsIsNotMin pathname
-      if (true && isNotMin) || ~_.indexOf parser.getParseExts(), ext
+      if (config.isProductionMode && isNotMin) || ~_.indexOf parser.getParseExts(), ext
         write = res.write
         end = res.end
         bufList = []
