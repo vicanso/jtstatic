@@ -75,24 +75,24 @@ class FileImporter
    * @return {String} 返回css标签
   ###
   exportCss : (merge) ->
-    @_getExportFilesHTML @cssFiles, 'css', merge, @hosts
+    @_getExportFilesHTML @cssFiles, 'css', merge
   ###*
    * exportJs 输出JS标签
    * @param  {Boolean} merge 是否合并js文件
    * @return {String} 返回js标签
   ###
   exportJs : (merge) ->
-    @_getExportFilesHTML @jsFiles, 'js', merge, @hosts
+    @_getExportFilesHTML @jsFiles, 'js', merge
 
   ###*
    * _getExportFilesHTML 获取引入文件列表对应的HTML
    * @param  {Array} files 引入文件列表
    * @param  {String} type  引入文件类型，现支持css, js
    * @param  {Boolean} merge 是否需要合并文件
-   * @param  {String} hosts 静态文件的host
    * @return {String} 返回html标签内容
   ###
-  _getExportFilesHTML : (files, type, merge, hosts) ->
+  _getExportFilesHTML : (files, type, merge) ->
+    hosts = @hosts
     resultFiles = []
     _.each files, (file) =>
       if !@_isFilter file

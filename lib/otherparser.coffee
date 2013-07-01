@@ -36,7 +36,7 @@ otherParser =
           async.waterfall [
             (cbf) ->
               if isNotMin
-                cbf null, uglifyJS.minify str, {fromString : true}
+                cbf null, uglifyJS.minify(str, {fromString : true}).code
               else
                 parser.parse file, str, cbf
             (data, cbf) ->

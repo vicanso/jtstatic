@@ -13,5 +13,7 @@ config =
   mergePath : ''
   # 合并文件列表
   mergeList : null
-config.isProductionMode = process.env.NODE_ENV is 'production'
+  # 是否使用内联图片，base64的形式
+  inlineImage : false
+config.isProductionMode = process.env.NODE_ENV == 'production'
 module.exports = config

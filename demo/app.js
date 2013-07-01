@@ -12,6 +12,7 @@
     mergeUrlPrefix: 'temp',
     maxAge: 300 * 1000,
     version: Math.floor(Date.now() / 1000),
+    inlineImage: true,
     mergeList: [['/javascripts/utils/underscore.min.js', '/javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']]
   });
 
@@ -19,11 +20,6 @@
 
   jtStatic.addParser('.sass', 'text/css', function(file, data, cbf) {
     return cbf(null, sass.render(data));
-  });
-
-  jtStatic.convertExts({
-    src: ['.min.js'],
-    dst: ['.js']
   });
 
   express = require('express');
@@ -45,8 +41,8 @@
       title: '测试标题'
     }, function(err, html) {
       var css, js;
-      css = fileImporter.exportCss(false);
-      js = fileImporter.exportJs(false);
+      css = fileImporter.exportCss(true);
+      js = fileImporter.exportJs(true);
       html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace('<!--JS_FILES_CONTAINER-->', js);
       return res.send(html);
     });
