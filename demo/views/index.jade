@@ -8,12 +8,14 @@ html(lang='zh-CN')
     meta(name='author',content='小墨鱼 vicanso 腻味 tree')
     title= title
     //CSS_FILES_CONTAINER
-    - fileImporter.importCss(['/stylesheets/global.styl', '/stylesheets/index.styl', '/stylesheets/test.sass']);
+    - fileImporter.importCss(['/stylesheets/global.styl', '/stylesheets/index.styl', '/stylesheets/test.sass', '/stylesheets/css.css']);
     - fileImporter.importJs('http://lib.sinaapp.com/js/jquery/1.8.3/jquery.min.js');
     - fileImporter.importJs(['javascripts/utils/underscore.min.js', 'javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']);
   body
     p 测试页面
     #test test
     #sass
+    .css.css1
+    .css.css2
   - fileImporter.importJs(['/javascripts/buypage.coffee', '/javascripts/global.coffee', '/javascripts/item.coffee', '/javascripts/test.js']);
   //JS_FILES_CONTAINER

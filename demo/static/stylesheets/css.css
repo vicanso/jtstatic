@@ -1,0 +1,10 @@
+.css{
+  width:600px;
+  height: 30px;
+}
+.css1{
+  background: url(./1.png);
+}
+.css2{
+  background-image : url(./1.jpg);
+}
