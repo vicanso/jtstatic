@@ -15,5 +15,6 @@ config =
   mergeList : null
   # 是否使用内联图片，base64的形式
   inlineImage : false
+  inlineImageSizeLimit : 15 * 1024
 config.isProductionMode = process.env.NODE_ENV == 'production'
 module.exports = config

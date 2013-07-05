@@ -1,0 +1,15 @@
+#test{
+	width: 300px;
+	height: 60px;
+	background: #fff url(./1.jpg);
+}
+#test2{
+	width: 300px;
+	height: 60px;
+	background-image :url(./1.jpg);
+}
+#test3{
+	width: 300px;
+	height: 60px;
+	background: url(./1.png);
+}

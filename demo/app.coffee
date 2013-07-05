@@ -43,3 +43,5 @@ app.get '/', (req, res) ->
     html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace '<!--JS_FILES_CONTAINER-->', js
     res.send html
 app.listen 8080
+
+console.log 'listen on 8080!'

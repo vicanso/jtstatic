@@ -1,5 +1,5 @@
 (function() {
-  var FileImporter, config, fs, jtStatic, parser, path, staticHandler, _;
+  var FileImporter, config, fs, inlineImage, jtStatic, parser, path, staticHandler, _;
 
   _ = require('underscore');
 
@@ -14,6 +14,8 @@
   path = require('path');
 
   parser = require('./lib/parser');
+
+  inlineImage = require('./lib/inlineimage');
 
   jtStatic = {
     FileImporter: FileImporter,
@@ -38,6 +40,49 @@
     addParser: parser.add,
     convertExts: function(exts) {
       return FileImporter.convertExts = exts;
+    },
+    url: function(options) {
+      var filePath;
+      filePath = options.path;
+      config.inlineImage = true;
+      if (options.limit) {
+        config.inlineImageSizeLimit = options.limit;
+      }
+      return function(req, res, next) {
+        var bufLength, bufList, end, ext, file, write;
+        file = path.join(filePath, req.url);
+        ext = path.extname(file);
+        if (ext === '.css') {
+          write = res.write;
+          end = res.end;
+          bufList = [];
+          bufLength = 0;
+          res.write = function(chunk, encoding) {
+            bufList.push(chunk);
+            return bufLength += chunk.length;
+          };
+          res.end = function(chunk, encoding) {
+            var str;
+            if (Buffer.isBuffer(chunk)) {
+              bufList.push(chunk);
+              bufLength += chunk.length;
+            }
+            str = Buffer.concat(bufList, bufLength).toString(encoding);
+            return inlineImage.url(str, file, function(err, data) {
+              var buf;
+              if (err) {
+                return next(err);
+              } else {
+                buf = new Buffer(data, encoding);
+                res.header('Content-Length', buf.length);
+                write.call(res, buf);
+                return end.call(res);
+              }
+            });
+          };
+        }
+        return next();
+      };
     }
   };
 
