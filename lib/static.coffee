@@ -17,8 +17,9 @@ staticHandler =
       url = req.url
       mergeUrlPrefix = config.mergeUrlPrefix
       notFound = ->
-        res.send 404, ''
-        res.end()
+        if !res.headerSent
+          res.send 404, ''
+          res.end()
       if mergeUrlPrefix.charAt(0) != '/'
         mergeUrlPrefix = '/' + mergeUrlPrefix
       if mergeUrlPrefix.charAt(mergeUrlPrefix.length - 1) != '/'
