@@ -31,6 +31,10 @@ otherParser =
           if Buffer.isBuffer chunk
             bufList.push chunk
             bufLength += chunk.length
+          if !bufLength
+            if !res.headerSent
+              end.call res
+            return
           str = Buffer.concat(bufList, bufLength).toString encoding
           file = path.join staticPath, pathname
           async.waterfall [
