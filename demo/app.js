@@ -32,9 +32,10 @@
 
   app.use('/static', jtStatic["static"]());
 
+  jtStatic.configure('hosts', ['http://test1.com', 'http://test2.com']);
+
   app.get('/', function(req, res) {
-    var fileImporter, hosts;
-    hosts = ['http://test1.com', 'http://test2.com'];
+    var fileImporter;
     fileImporter = new jtStatic.FileImporter;
     return res.render('index', {
       fileImporter: fileImporter,

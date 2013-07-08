@@ -30,8 +30,9 @@ app.set 'views', './views'
 
 app.use '/static', jtStatic.static()
 
+jtStatic.configure 'hosts', ['http://test1.com', 'http://test2.com']
+
 app.get '/', (req, res) ->
-  hosts = ['http://test1.com', 'http://test2.com']
   # fileImporter = new jtStatic.FileImporter debugMode, hosts
   fileImporter = new jtStatic.FileImporter
   res.render 'index', {

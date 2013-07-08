@@ -18,6 +18,8 @@ class FileImporter
   constructor : (@host) ->
     @cssFiles = []
     @jsFiles = []
+    if !@hosts
+      @hosts = config.hosts
     if @hosts && !_.isArray @hosts
       @hosts = [@hosts]
   ###*
