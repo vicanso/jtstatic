@@ -5,8 +5,10 @@ jtStatic.configure
   path : "#{__dirname}/static"
   urlPrefix : '/static'
   mergePath : "#{__dirname}/static/temp"
-  mergeUrlPrefix : 'temp'
+  mergeUrlPrefix : '/temp'
   maxAge : 300 * 1000
+  headers : 
+    'v-ttl' : '10m'
   version : Math.floor Date.now() / 1000
   inlineImage : true
   mergeList : [
@@ -30,7 +32,7 @@ app.set 'views', './views'
 
 app.use '/static', jtStatic.static()
 
-jtStatic.configure 'hosts', ['http://test1.com', 'http://test2.com']
+# jtStatic.configure 'hosts', ['http://test1.com', 'http://test2.com']
 
 app.get '/', (req, res) ->
   # fileImporter = new jtStatic.FileImporter debugMode, hosts

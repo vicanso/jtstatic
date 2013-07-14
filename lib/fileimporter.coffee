@@ -102,7 +102,7 @@ class FileImporter
         # if debug && type == 'js'
         #   file = file.replace '.min.js', '.js'
         defineMergeList = fileMerger.getDefineMergeList file
-        if defineMergeList && config.isProudctionMode
+        if defineMergeList && config.isProductionMode
           resultFiles.push defineMergeList
         else
           resultFiles.push file

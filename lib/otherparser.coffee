@@ -5,7 +5,6 @@ fs = require 'fs'
 config = require './config'
 parser = require './parser'
 async = require 'async'
-uglifyJS = require 'uglify-js'
 otherParser = 
   ###*
    * parser 其它类型的paser处理
@@ -14,11 +13,10 @@ otherParser =
   ###
   parser : (staticPath) ->
     url = require 'url'
-    return (req, res, next) ->
+    (req, res, next) ->
       pathname = url.parse(req.url).pathname
       ext = path.extname pathname
-      isNotMin = jsIsNotMin pathname
-      if (config.isProductionMode && isNotMin) || ~_.indexOf parser.getParseExts(), ext
+      if ~_.indexOf parser.getParseExts(), ext
         write = res.write
         end = res.end
         bufList = []
@@ -39,10 +37,7 @@ otherParser =
           file = path.join staticPath, pathname
           async.waterfall [
             (cbf) ->
-              if isNotMin
-                cbf null, uglifyJS.minify(str, {fromString : true}).code
-              else
-                parser.parse file, str, cbf
+              parser.parse file, str, cbf
             (data, cbf) ->
               buf = new Buffer data, encoding
               res.header 'Content-Length' , buf.length
@@ -54,13 +49,4 @@ otherParser =
               if !config.isProductionMode
                 throw err
       next()
-
-
-jsIsNotMin = (file) ->
-  jsExt = '.js'
-  jsMinExt = '.min.js'
-  if jsExt == file.substring(file.length - jsExt.length) && jsMinExt != file.substring file.length - jsMinExt.length
-    true
-  else
-    false
 module.exports = otherParser

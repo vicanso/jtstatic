@@ -13,7 +13,10 @@ staticHandler =
       redirect : false
     }
     otherParser = require('./otherparser').parser config.path
+    defaultHeaders = config.headers
     (req, res) ->
+      if defaultHeaders
+        res.header defaultHeaders
       url = req.url
       mergeUrlPrefix = config.mergeUrlPrefix
       notFound = ->

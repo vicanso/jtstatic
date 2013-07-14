@@ -51,5 +51,5 @@ jtStatic =
               write.call res, buf
               end.call res
       next()
-
+      
 module.exports = jtStatic
