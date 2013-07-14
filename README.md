@@ -1,5 +1,23 @@
 # jtstatic - 主要用于处理HTTP的静态请求，以及引入静态文件
 
+##需求
+
+- 在编写页面的时候，希望将页面分块，模块化（以及其对应的css、js模块化）。
+- 在生产环境中，静态文件一般的改动都是比较少的，可以让浏览器缓存较长的时间，那么如果能够在更新的时候，及时通知浏览器更新缓存文件。
+- 将功能模块化之后，有可能会产品较多数据量较少的文件，如何处理这些文件。
+- 在生产环境中，希望静态文件由其它的域名中加载（甚至多于一个域名中加载）。
+- 在生产环境中，希望将一些较小的图片以base64的形式内联到css文件中。
+- 在生产环境中，希望将一些较能用的文件合并到一个文件中，减少请求数（这些文件可以动态的增加、减少，在开发环境中不用考虑引入的文件是否常用文件）
+
+## 解决方法
+
+- 添加一个FileImporter类，主要用于引入css、js文件，每个模块只要引入自己需要使用到的文件，而不用考虑是否在其它的模块中已引入（重复引入的静态文件会去重）
+- 每次deploy的时候，生成一个version，保证每次deploy之后使用的静态文件都不一样
+- 可以自动将页面中使用的js、css合并。
+- 自动读取css中的图片url，判断图片的大小，生成相应的base64数据。（由于IE6、7不支持，生成相应的css hack）
+- 可以指定一些公共文件合并，这些文件会自动合成另外一个文件
+
+
 ##特性
 
 - 在模板中方便引入JS、CSS文件，自动过滤重复引入的文件。
@@ -26,8 +44,10 @@
     mergeUrlPrefix: 'temp',
     // 设置静态文件的maxAge单位ms
     maxAge: 300 * 1000,
-    // 静态文件URL带的版本号，?version=xxxx，可以不传
+    // 静态文件URL带的版本号，?version=xxxx，可以不传，使用中不要使用Date.now()，因为node有退出重启，很次都会不一次，应该在deploy生成一个version
     version: Math.floor(Date.now() / 1000),
+    // 将小图片内联（使用base64的方式）
+    inlineImage : true,
     // 固定的合并文件（主要是将一些通用的文件合并）
     mergeList: [['/javascripts/utils/underscore.min.js', '/javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']]
   });
@@ -94,6 +114,7 @@ html(lang='zh-CN')
 - [jtStatic.emptyMergePath] (#emptyMergePath)
 - [jtStatic.addParser] (#addParser)
 - [jtStatic.convertExts] (#convertExts)
+- [jtStatic.url] (#url)
 - [jtStatic.FileImporter] (#FileImporter)
 - [FileImporter.importCss FileImporter.importJs] (#importFile)
 - [FileImporter.exportCss FileImporter.exportJs] (#exportFile)
@@ -140,6 +161,20 @@ jtStatic.convertExts({
   src: ['.min.js'],
   dst: ['.js']
 });
+```
+
+<a name="url" />
+## url
+### 将css中的引入的图片文件使用base64的方式
+
+### 参数列表
+- options {path : 静态文件路径, limit : 文件大小限制}
+
+```js
+app.use('/static', jtStatic.url({
+  path: __dirname + '/static',
+  limit: 100 * 1024
+}));
 ```
 
 

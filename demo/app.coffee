@@ -7,8 +7,6 @@ jtStatic.configure
   mergePath : "#{__dirname}/static/temp"
   mergeUrlPrefix : '/temp'
   maxAge : 300 * 1000
-  headers : 
-    'v-ttl' : '10m'
   version : Math.floor Date.now() / 1000
   inlineImage : true
   mergeList : [
