@@ -2,7 +2,7 @@
 path = require 'path'
 _ = require 'underscore'
 fs = require 'fs'
-config = require './config'
+isProductionMode = process.env.NODE_ENV == 'production'
 parser = require './parser'
 async = require 'async'
 otherParser = 
@@ -46,7 +46,7 @@ otherParser =
           ], (err) ->
             if err
               console.error err
-              if !config.isProductionMode
+              if !isProductionMode
                 throw err
       next()
 module.exports = otherParser

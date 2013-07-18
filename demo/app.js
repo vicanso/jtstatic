@@ -1,18 +1,18 @@
 (function() {
-  var app, express, jtStatic, sass;
+  var JTStatic, app, express, jtStatic, sass;
 
-  jtStatic = require('../index');
+  JTStatic = require('../index');
 
   sass = require('sass');
 
-  jtStatic.configure({
+  jtStatic = new JTStatic({
     path: "" + __dirname + "/static",
     urlPrefix: '/static',
     mergePath: "" + __dirname + "/static/temp",
     mergeUrlPrefix: '/temp',
-    maxAge: 300 * 1000,
+    maxAge: 300,
     version: Math.floor(Date.now() / 1000),
-    inlineImage: true,
+    inlineImage: false,
     mergeList: [['/javascripts/utils/underscore.min.js', '/javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']]
   });
 
@@ -34,7 +34,7 @@
 
   app.get('/', function(req, res) {
     var fileImporter;
-    fileImporter = new jtStatic.FileImporter;
+    fileImporter = jtStatic.getFileImporter();
     return res.render('index', {
       fileImporter: fileImporter,
       title: '测试标题'
@@ -47,7 +47,7 @@
     });
   });
 
-  app.listen(8080);
+  app.listen(10000);
 
   console.log('listen on 8080!');
 

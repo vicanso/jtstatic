@@ -6,20 +6,18 @@
 _ = require 'underscore'
 fs = require 'fs'
 
-config = require './config'
 fileMerger = require './filemerger'
-
+isProductionMode = process.env.NODE_ENV == 'production'
 class FileImporter
   ###*
    * constructor 文件引入类
    * @param  {String} hosts 静态文件的hosts
    * @return {FileImporter}       [description]
   ###
-  constructor : (@host) ->
+  constructor : (@host, @options) ->
     @cssFiles = []
     @jsFiles = []
-    if !@hosts
-      @hosts = config.hosts
+    @hosts ?= @options?.hosts
     if @hosts && !_.isArray @hosts
       @hosts = [@hosts]
   ###*
@@ -99,24 +97,27 @@ class FileImporter
     _.each files, (file) =>
       if !@_isFilter file
         file = @_convertExt file
-        # if debug && type == 'js'
-        #   file = file.replace '.min.js', '.js'
-        defineMergeList = fileMerger.getDefineMergeList file
-        if defineMergeList && config.isProductionMode
+        # 判断该文件是否在合并列表中
+        defineMergeList = fileMerger.getDefineMergeList file, @options.mergeList
+        if defineMergeList && isProductionMode
           resultFiles.push defineMergeList
         else
           resultFiles.push file
       else
         resultFiles.push file
     resultFiles = _.uniq _.compact resultFiles
-    otherFiles = []
 
     mergeFile = (files) =>
-      linkFileName = fileMerger.mergeFilesToTemp files, type
-      mergeUrlPrefix = config.mergeUrlPrefix
+      limit = 0
+      if @options.inlineImage
+        limit = @options.inlineImageSizeLimit
+      linkFileName = fileMerger.mergeFilesToTemp files, type, @options.path, @options.mergePath, limit
+      mergeUrlPrefix = @options.mergeUrlPrefix
       if mergeUrlPrefix
         linkFileName = "#{mergeUrlPrefix}/#{linkFileName}"
       @_getExportHTML linkFileName, type, hosts
+    # 除预先定义需要合并的文件之外的所有文件  
+    otherFiles = []
     htmlArr = _.map resultFiles, (result) =>
       if _.isArray result
         mergeFile result
@@ -177,8 +178,8 @@ class FileImporter
    * @return {[type]}      [description]
   ###
   _getUrl : (file, hosts) ->
-    version = config.version
-    urlPrefix = config.urlPrefix
+    version = @options.version
+    urlPrefix = @options.urlPrefix
     if urlPrefix.charAt(0) != '/'
       urlPrefix = '/' + urlPrefix
     if !@_isFilter file

@@ -2,7 +2,6 @@ _ = require 'underscore'
 path = require 'path'
 fs = require 'fs'
 async = require 'async'
-config = require './config'
 inlineImage =
   ###*
    * url css中的URL处理
@@ -12,16 +11,27 @@ inlineImage =
    * @param  {[type]} cbf      [description]
    * @return {[type]}          [description]
   ###
-  url : (data, file, saveFile, cbf) ->
+  url : (data, file, saveFile, limit, cbf) ->
+    defaultLimitSize = 10 * 1024
     if _.isFunction saveFile
       cbf = saveFile
       saveFile = ''
+      limit = defaultLimitSize
+    if _.isNumber saveFile
+      limit = saveFile
+      saveFile = ''
+    if _.isFunction limit
+      cbf = limit
+      limit = defaultLimitSize
+    limit ?= defaultLimitSize
+
     if saveFile
       imagesPath = path.relative path.dirname(saveFile), path.dirname(file)
     imageInlineHandle = @imageInlineHandle {
       path : path.dirname file
+      limit : limit
     }
-    reg = /background(-image)?\s*?:[\s\S]*?url\(([\s\S]*?)\)[\s\S]*?;/g
+    reg = /background(-image)?\s*?:[\s\S]*?url\(([\s\S]*?)\)[\s\S]*?[;\n\}]/g
     cssData = []
     result = null
     startIndex = 0
@@ -64,7 +74,7 @@ inlineImage =
   ###
   imageInlineHandle : (options) ->
     filePath = options.path
-    limit = options.limit || config.inlineImageSizeLimit
+    limit = options.limit
     mimes =
       '.gif' : 'image/gif'
       '.png' : 'image/png'
@@ -74,7 +84,7 @@ inlineImage =
     (file, cbf) ->
       ext = path.extname file
       mime = mimes[ext]
-      if !config.inlineImage || !file.indexOf 'http' || !mime
+      if !file.indexOf 'http' || !mime || !limit
         cbf null, ''
         return
       file = path.join filePath, file

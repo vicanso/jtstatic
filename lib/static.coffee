@@ -1,24 +1,22 @@
-config = require './config'
+# config = require './config'
 express = require 'express'
 async = require 'async'
 path = require 'path'
-
+isProductionMode = process.env.NODE_ENV == 'production'
 staticHandler =
-  handler : ->
-    maxAge = config.maxAge || 300 * 1000
-    if !config.isProductionMode
-      maxAge = 0
-    handler = express.static "#{config.path}", {
-      maxAge : maxAge
+  handler : (options) ->
+    options.maxAge ?= 300
+    handler = express.static "#{options.path}", {
+      maxAge : options.maxAge * 1000
       redirect : false
     }
-    otherParser = require('./otherparser').parser config.path
-    defaultHeaders = config.headers
+    otherParser = require('./otherparser').parser options.path
+    defaultHeaders = options.headers
     (req, res) ->
       if defaultHeaders
         res.header defaultHeaders
       url = req.url
-      mergeUrlPrefix = config.mergeUrlPrefix
+      mergeUrlPrefix = options.mergeUrlPrefix
       notFound = ->
         if !res.headerSent
           res.send 404, ''
@@ -28,7 +26,7 @@ staticHandler =
       if mergeUrlPrefix.charAt(mergeUrlPrefix.length - 1) != '/'
         mergeUrlPrefix += '/'
       if url.indexOf(mergeUrlPrefix) == 0
-        mergeFileHandle path.join(config.path, url), ->
+        mergeFileHandle path.join(options.path, url), ->
           handler req, res, notFound
       else
         otherParser req, res, () ->

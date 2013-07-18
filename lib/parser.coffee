@@ -1,14 +1,12 @@
 _ = require 'underscore'
-less = require 'less'
-coffeeScript = require 'coffee-script'
-stylus = require 'stylus'
-uglifyJS = require 'uglify-js'
+
+
 path = require 'path'
-config = require './config'
 express = require 'express'
 express.mime.types['less'] = 'text/css'
 express.mime.types['styl'] = 'text/css'
 express.mime.types['coffee'] = 'application/javascript'
+isProductionMode = process.env.NODE_ENV == 'production'
 parser = 
   ###*
    * parseLess 编译less
@@ -18,6 +16,7 @@ parser =
    * @return {parser}
   ###
   parseLess : (data, options, cbf) ->
+    less = require 'less'
     paths = options.paths
     delete options.paths
     env = 
@@ -38,6 +37,7 @@ parser =
    * @return {parser}
   ###
   parseCoffee : (data, minifyOptions, cbf) ->
+    coffeeScript = require 'coffee-script'
     try
       jsStr = coffeeScript.compile data
     catch err
@@ -47,6 +47,7 @@ parser =
       cbf = minifyOptions
       minifyOptions = null
     if minifyOptions
+      uglifyJS = require 'uglify-js'
       minifyCode = uglifyJS.minify jsStr, minifyOptions
       jsStr = minifyCode.code
     cbf null, jsStr
@@ -59,6 +60,7 @@ parser =
    * @return {parser}
   ###
   parseStylus : (data, options, cbf) ->
+    stylus = require 'stylus'
     stylus.render data, options, cbf
     return @
 
@@ -75,7 +77,7 @@ parserHandler =
     options = 
       paths : [path.dirname file]
       filename : file
-    if config.isProductionMode
+    if isProductionMode
       options.compress = true
     parser.parseLess data, options, cbf
 
@@ -87,7 +89,7 @@ parserHandler =
    * @return {[type]}      [description]
   ###
   coffee : (file, data, cbf) ->
-    if config.isProductionMode
+    if isProductionMode
       options = 
         fromString : true
         warnings : true
@@ -105,7 +107,7 @@ parserHandler =
   styl : (file, data, cbf) ->
     options = 
       filename : file
-    if config.isProductionMode
+    if isProductionMode
       options.compress = true
     parser.parseStylus data, options, cbf
 

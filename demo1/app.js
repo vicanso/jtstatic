@@ -1,13 +1,13 @@
 (function() {
-  var app, express, jtStatic;
+  var JTStatic, app, express;
 
-  jtStatic = require('../index');
+  JTStatic = require('../index');
 
   express = require('express');
 
   app = express();
 
-  app.use('/static', jtStatic.url({
+  app.use('/static', JTStatic.url({
     path: __dirname + '/static',
     limit: 100 * 1024
   }));
