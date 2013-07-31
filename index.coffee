@@ -22,6 +22,9 @@ class JTStatic
     # 是否使用内联图片，base64的形式
     inlineImage : false
     inlineImageSizeLimit : 15 * 1024
+    if options?.convertExts
+      FileImporter.convertExts = options.convertExts
+      delete options.convertExts
     @options = _.extend defaults, options
   ###*
    * getFileImporter 获取fileImporter实例
@@ -53,9 +56,15 @@ class JTStatic
   ###
   configure : (key, value) ->
     if _.isObject key
+      if key?.convertExts
+        FileImporter.convertExts = key.convertExts
+        delete key.convertExts
       _.extend @options, key
     else
-      @options[key] = value
+      if key == 'convertExts'
+        FileImporter.convertExts = value
+      else
+        @options[key] = value
   ###*
    * addParser 添加其它可处理的文件，如scss。（建议在prodution环境中，将所有需要编译的文件都编译之后再deploy，不实时编译）
    * @type {[type]}

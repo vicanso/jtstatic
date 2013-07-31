@@ -28,6 +28,10 @@
         inlineImage: false,
         inlineImageSizeLimit: 15 * 1024
       };
+      if (options != null ? options.convertExts : void 0) {
+        FileImporter.convertExts = options.convertExts;
+        delete options.convertExts;
+      }
       this.options = _.extend(defaults, options);
     }
 
@@ -80,9 +84,17 @@
 
     JTStatic.prototype.configure = function(key, value) {
       if (_.isObject(key)) {
+        if (key != null ? key.convertExts : void 0) {
+          FileImporter.convertExts = key.convertExts;
+          delete key.convertExts;
+        }
         return _.extend(this.options, key);
       } else {
-        return this.options[key] = value;
+        if (key === 'convertExts') {
+          return FileImporter.convertExts = value;
+        } else {
+          return this.options[key] = value;
+        }
       }
     };
 

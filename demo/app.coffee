@@ -44,6 +44,6 @@ app.get '/', (req, res) ->
     js = fileImporter.exportJs true
     html = html.replace('<!--CSS_FILES_CONTAINER-->', css).replace '<!--JS_FILES_CONTAINER-->', js
     res.send html
-app.listen 10000
+app.listen 8080
 
 console.log 'listen on 8080!'
