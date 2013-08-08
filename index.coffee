@@ -114,5 +114,5 @@ urlHandle = (res, file, limit) ->
         write.call res, buf
         end.call res
 
-JTStatic.url = JTStatic.prototype.url  
+JTStatic.url = JTStatic::url  
 module.exports = JTStatic
