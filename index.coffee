@@ -37,8 +37,8 @@ class JTStatic
    * static 静态处理文件的middleware
    * @return {[type]} [description]
   ###
-  static : () ->
-    staticHandler.handler @options
+  static : (options) ->
+    staticHandler.handler _.extend {}, @options, options
   ###*
    * emptyMergePath 清空临时合并目录（原则上每次deploy都要清空）
    * @param  {[type]} mergePath =             @options.mergePath [description]

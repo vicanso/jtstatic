@@ -12,25 +12,21 @@ staticHandler =
     }
     otherParser = require('./otherparser').parser options.path
     defaultHeaders = options.headers
-    (req, res) ->
+    (req, res, next) ->
       if defaultHeaders
         res.header defaultHeaders
       url = req.url
       mergeUrlPrefix = options.mergeUrlPrefix
-      notFound = ->
-        if !res.headerSent
-          res.send 404, ''
-          res.end()
       if mergeUrlPrefix.charAt(0) != '/'
         mergeUrlPrefix = '/' + mergeUrlPrefix
       if mergeUrlPrefix.charAt(mergeUrlPrefix.length - 1) != '/'
         mergeUrlPrefix += '/'
       if url.indexOf(mergeUrlPrefix) == 0
         mergeFileHandle path.join(options.path, url), ->
-          handler req, res, notFound
+          handler req, res, next
       else
         otherParser req, res, () ->
-          handler req, res, notFound
+          handler req, res, next
 ###*
  * mergeFileHandle 合并文件夹的文件处理
  * @param  {String} file 文件名

@@ -201,7 +201,7 @@ class FileImporter
   _convertExt : (file) ->
     convertExts = FileImporter.convertExts
     if convertExts?.src && convertExts.dst
-      dstExt = -1
+      dstExt = ''
       srcExt = _.find convertExts.src, (ext, i) ->
         if ext == file.substring file.length - ext.length
           dstExt = convertExts.dst[i]

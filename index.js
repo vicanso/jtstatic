@@ -16,7 +16,6 @@
   inlineImage = require('./lib/inlineimage');
 
   JTStatic = (function() {
-
     function JTStatic(options) {
       var defaults;
       defaults = {
@@ -52,8 +51,8 @@
     */
 
 
-    JTStatic.prototype["static"] = function() {
-      return staticHandler.handler(this.options);
+    JTStatic.prototype["static"] = function(options) {
+      return staticHandler.handler(_.extend({}, this.options, options));
     };
 
     /**
