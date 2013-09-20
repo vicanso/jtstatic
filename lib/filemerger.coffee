@@ -85,11 +85,10 @@ fileMerger =
       hashList = _.map arr, (file) ->
         path.basename file
       name = hashList.join '-'
-      hash = crypto.createHash('sha1').update(arr.join('')).digest 'hex'
       if name.length < 0x7f
-        name + hash
+        name
       else
-        hash
+        crypto.createHash('sha1').update(arr.join('')).digest 'hex'
 
     linkFileHash = getFileHash mergeFiles
     linkFileName = "#{linkFileHash}.#{type}" 
