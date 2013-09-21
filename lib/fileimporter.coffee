@@ -108,7 +108,7 @@ class FileImporter
     resultFiles = _.uniq _.compact resultFiles
 
     mergeFile = (files) =>
-      limit = 0
+      limit = null
       if @options.inlineImage
         limit = @options.inlineImageSizeLimit
       linkFileName = fileMerger.mergeFilesToTemp files, type, @options.path, @options.mergePath, limit
