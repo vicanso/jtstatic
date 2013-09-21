@@ -56,9 +56,10 @@ inlineImage =
           if newImgUrl
             newCss = css.replace replaceImageUrl, '"' + newImgUrl + '"'
           if newCss && newCss != css
-            cssData.push newCss
+            tmpCss = css.substring 0, css.length - 1
             if dataUri
-              cssData.push ";*#{css}"
+              cssData.push ";*#{tmpCss};"
+            cssData.push newCss
             startIndex += css.length
           cbf err
       else
