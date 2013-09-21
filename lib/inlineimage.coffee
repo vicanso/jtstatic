@@ -58,7 +58,7 @@ inlineImage =
           if newCss && newCss != css
             cssData.push newCss
             if dataUri
-              cssData.push "*#{css}"
+              cssData.push ";*#{css}"
             startIndex += css.length
           cbf err
       else
