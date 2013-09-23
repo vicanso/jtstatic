@@ -20,6 +20,11 @@ class FileImporter
     @hosts ?= @options?.hosts
     if @hosts && !_.isArray @hosts
       @hosts = [@hosts]
+    @hosts = _.map @hosts, (host) ->
+      if 'http' != host.substring 0, 4
+        host = "http://#{host}"
+      else
+        host
   ###*
    * importCss 引入css文件
    * @param  {String} file     css路径
