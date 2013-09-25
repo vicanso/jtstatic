@@ -22,7 +22,7 @@ fileMerger =
     if mergeList
       result = _.find mergeList, (item) ->
         ~_.indexOf item, file
-    result
+    _.clone result
   ###*
    * mergeFiles 合并文件
    * @param  {Array} files 需要合并的文件列表
