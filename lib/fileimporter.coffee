@@ -14,17 +14,18 @@ class FileImporter
    * @param  {String} hosts 静态文件的hosts
    * @return {FileImporter}       [description]
   ###
-  constructor : (@host, @options) ->
+  constructor : (@host, @options = {}) ->
     @cssFiles = []
     @jsFiles = []
-    @hosts ?= @options?.hosts
-    if @hosts && !_.isArray @hosts
-      @hosts = [@hosts]
-    @hosts = _.map @hosts, (host) ->
-      if 'http' != host.substring 0, 4
-        host = "http://#{host}"
-      else
-        host
+    @hosts ?= @options.hosts
+    if @hosts
+      if !_.isArray @hosts
+        @hosts = [@hosts]
+      @hosts = _.map @hosts, (host) ->
+        if 'http' != host.substring 0, 4
+          host = "http://#{host}"
+        else
+          host
   ###*
    * importCss 引入css文件
    * @param  {String} file     css路径
@@ -120,7 +121,7 @@ class FileImporter
       mergeUrlPrefix = @options.mergeUrlPrefix
       if mergeUrlPrefix
         linkFileName = "#{mergeUrlPrefix}/#{linkFileName}"
-      @_getExportHTML linkFileName, type, hosts
+      @_getExportHTML linkFileName, type
     # 除预先定义需要合并的文件之外的所有文件  
     otherFiles = []
     htmlArr = _.map resultFiles, (result) =>
@@ -130,10 +131,13 @@ class FileImporter
         otherFiles.push result
         ''
       else
-        @_getExportHTML result, type, hosts
+        @_getExportHTML result, type
     if otherFiles.length
       htmlArr.push mergeFile otherFiles
-    htmlArr.join ''
+    if @options.exportToArray && type == 'js'
+      '<script type="text/javascript">var JT_JS_FILES =' + JSON.stringify(htmlArr) + ';</script>'
+    else
+      htmlArr.join ''
 
   ###*
    * _isFilter 判断该文件是否应该过滤的
@@ -149,14 +153,13 @@ class FileImporter
    * _getExportHTML 返回生成的HTML
    * @param  {String} file   引入的文件
    * @param  {String} type   文件类型
-   * @param  {String} hosts 静态文件的host
    * @return {String} 返回相应的html
   ###
-  _getExportHTML : (file, type, hosts) ->
+  _getExportHTML : (file, type) ->
     html = ''
     switch type
-      when 'js' then html = @_exportJsHTML file, hosts
-      else html = @_exportCssHTML file, hosts
+      when 'js' then html = @_exportJsHTML file
+      else html = @_exportCssHTML file
     return html
 
   ###*
@@ -164,25 +167,29 @@ class FileImporter
    * @param  {String} file   引入的文件
    * @return {String} 返回相应的html
   ###
-  _exportJsHTML : (file, hosts) ->
-    url = @_getUrl file, hosts
-    '<script type="text/javascript" src="' + url + '"></script>'
+  _exportJsHTML : (file) ->
+
+    url = @_getUrl file
+    if @options.exportToArray
+      url
+    else
+      '<script type="text/javascript" src="' + url + '"></script>'
 
   ###*
    * _exportCssHTML 返回引入CSS标签的HTML
    * @param  {String} file   引入的文件
    * @return {String} 返回相应的html
   ###
-  _exportCssHTML : (file, hosts) ->
-    url = @_getUrl file, hosts
+  _exportCssHTML : (file) ->
+    url = @_getUrl file
     '<link rel="stylesheet" href="' + url + '" type="text/css" />'
   ###*
    * _getUrl 获取引用文件的URL
    * @param  {String} file 文件路径
-   * @param  {String, Array} hosts 文件域名
    * @return {[type]}      [description]
   ###
-  _getUrl : (file, hosts) ->
+  _getUrl : (file) ->
+    hosts = @hosts
     version = @options.version
     urlPrefix = @options.urlPrefix
     if urlPrefix.charAt(0) != '/'
@@ -196,7 +203,8 @@ class FileImporter
         file = "#{urlPrefix}#{file}"
       if hosts
         index = file.length % hosts.length
-        file = hosts[index] + file
+        host = hosts[index]
+        file = host + file if host
     file
   ###*
    * _convertExt 转换文件后缀
