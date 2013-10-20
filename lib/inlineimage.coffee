@@ -31,7 +31,7 @@ inlineImage =
       path : path.dirname file
       limit : limit
     }
-    reg = /background(-image)?\s*?:[\s\S]*?url\(([\s\S]*?)\)[\s\S]*?[;\n\}]/g
+    reg = /background(-image)?\s*?:[^;\n\}]*?url\(([\s\S]*?)\)[\s\S]*?[;\n\}]/g
     cssData = []
     result = null
     startIndex = 0

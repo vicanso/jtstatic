@@ -52,7 +52,7 @@ fileMerger =
             else
               cbf null, "/*#{file}*/#{data}"
           (data, cbf) =>
-            if ext == '.less' || ext == '.css' || ext == '.styl'
+            if (ext == '.less' || ext == '.css' || ext == '.styl') && limitSize
               inlineImage.url data, file, saveFile, limitSize, cbf
             else
               cbf null, data
