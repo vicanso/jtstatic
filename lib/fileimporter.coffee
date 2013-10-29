@@ -111,7 +111,7 @@ class FileImporter
           resultFiles.push file
       else
         resultFiles.push file
-    resultFiles = _.uniq _.compact resultFiles
+    resultFiles = _.compact resultFiles
 
     mergeFile = (files) =>
       limit = 0
@@ -134,6 +134,7 @@ class FileImporter
         @_getExportHTML result, type
     if otherFiles.length
       htmlArr.push mergeFile otherFiles
+    htmlArr = _.uniq htmlArr
     if @options.exportToArray && type == 'js'
       '<script type="text/javascript">var JT_JS_FILES =' + JSON.stringify(htmlArr) + ';</script>'
     else
