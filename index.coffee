@@ -19,9 +19,6 @@ class JTStatic
       mergePath : ''
       # 合并文件列表
       mergeList : null
-      # 是否使用内联图片，base64的形式
-      inlineImage : false
-      inlineImageSizeLimit : 15 * 1024
       if options?.convertExts
         FileImporter.convertExts = options.convertExts
         delete options.convertExts
@@ -77,20 +74,6 @@ class JTStatic
   ###
   convertExts : (exts) ->
     FileImporter.convertExts = exts
-  ###*
-   * url 将css中的引入的图片转换为base64的方式引入
-   * @param  {[type]} options [description]
-   * @return {[type]}         [description]
-  ###
-  url : (options) ->
-    filePath = options.path
-    limit = options.limit
-    (req, res, next) ->
-      file = path.join filePath, req.url
-      ext = path.extname file
-      if ext == '.css'
-        urlHandle res, file, limit
-      next()
 
 urlHandle = (res, file, limit) ->
   write = res.write

@@ -6,7 +6,6 @@
 - 在生产环境中，静态文件一般的改动都是比较少的，可以让浏览器缓存较长的时间，那么如果能够在更新的时候，及时通知浏览器更新缓存文件。
 - 将功能模块化之后，有可能会产品较多数据量较少的文件，如何处理这些文件。
 - 在生产环境中，希望静态文件由其它的域名中加载（甚至多于一个域名中加载）。
-- 在生产环境中，希望将一些较小的图片以base64的形式内联到css文件中。
 - 在生产环境中，希望将一些较能用的文件合并到一个文件中，减少请求数（这些文件可以动态的增加、减少，在开发环境中不用考虑引入的文件是否常用文件）
 
 ## 解决方法
@@ -14,7 +13,6 @@
 - 添加一个FileImporter类，主要用于引入css、js文件，每个模块只要引入自己需要使用到的文件，而不用考虑是否在其它的模块中已引入（重复引入的静态文件会去重）
 - 每次deploy的时候，生成一个version，保证每次deploy之后使用的静态文件都不一样
 - 可以自动将页面中使用的js、css合并。
-- 自动读取css中的图片url，判断图片的大小，生成相应的base64数据。（由于IE6、7不支持，生成相应的css hack）
 - 可以指定一些公共文件合并，这些文件会自动合成另外一个文件
 
 
@@ -24,7 +22,6 @@
 - 实现JS、CSS文件的自动合并，减少HTTP请求。（可自定义哪些文件合并，页面其它的文件会自动合并）
 - 支持stylus、less和coffee-script文件的处理。（可直接引入这些文件，输出到浏览器的时候会自动编译，方便开发中使用）
 - 引入的静态的文件可以指定到几个域名中。
-- 将css中引入的图片以base64的形式合并到css中。
 
 ##Demo
 在demo下面有现成的例子，大家可以运行一下
@@ -47,13 +44,9 @@
     maxAge: 300 * 1000,
     // 静态文件URL带的版本号，?version=xxxx，可以不传，使用中不要使用Date.now()，因为node有退出重启，很次都会不一次，应该在deploy生成一个version
     version: Math.floor(Date.now() / 1000),
-    // 将小图片内联（使用base64的方式）
-    inlineImage : true,
     // 固定的合并文件（主要是将一些通用的文件合并）
     mergeList: [['/javascripts/utils/underscore.min.js', '/javascripts/utils/backbone.min.js', '/javascripts/utils/async.min.js']]
   });
-  //清空静态文件合并的目录
-  jtStatic.emptyMergePath();
 
   jtStatic.addParser('.sass', 'text/css', function(file, data, cbf) {
     return cbf(null, sass.render(data));
@@ -112,10 +105,8 @@ html(lang='zh-CN')
 
 ##API
 - [jtStatic.static] (#static)
-- [jtStatic.emptyMergePath] (#emptyMergePath)
 - [jtStatic.addParser] (#addParser)
 - [jtStatic.convertExts] (#convertExts)
-- [jtStatic.url] (#url)
 - [jtStatic.FileImporter] (#FileImporter)
 - [FileImporter.importCss FileImporter.importJs] (#importFile)
 - [FileImporter.exportCss FileImporter.exportJs] (#exportFile)
@@ -128,13 +119,6 @@ html(lang='zh-CN')
 app.use('/static', jtStatic["static"]());
 ```
 
-<a name="emptyMergePath" />
-## emptyMergePath
-### 清空存储合并文件的临时目录
-
-```js
-jtStatic.emptyMergePath();
-```
 
 <a name="addParser" />
 ## addParser
@@ -164,19 +148,6 @@ jtStatic.convertExts({
 });
 ```
 
-<a name="url" />
-## url
-### 将css中的引入的图片文件使用base64的方式
-
-### 参数列表
-- options {path : 静态文件路径, limit : 文件大小限制}
-
-```js
-app.use('/static', jtStatic.url({
-  path: __dirname + '/static',
-  limit: 100 * 1024
-}));
-```
 
 
 <a name="FileImporter" />

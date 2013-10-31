@@ -112,12 +112,14 @@ class FileImporter
       else
         resultFiles.push file
     resultFiles = _.compact resultFiles
+    resultFiles = _.uniq resultFiles, (item) ->
+      if _.isArray item
+        item.join ','
+      else
+        item
 
     mergeFile = (files) =>
-      limit = 0
-      if @options.inlineImage
-        limit = @options.inlineImageSizeLimit
-      linkFileName = fileMerger.mergeFilesToTemp files, type, @options.path, @options.mergePath, limit
+      linkFileName = fileMerger.mergeFilesToTemp files, type, @options.path, @options.mergePath
       mergeUrlPrefix = @options.mergeUrlPrefix
       if mergeUrlPrefix
         linkFileName = "#{mergeUrlPrefix}/#{linkFileName}"
@@ -134,7 +136,6 @@ class FileImporter
         @_getExportHTML result, type
     if otherFiles.length
       htmlArr.push mergeFile otherFiles
-    htmlArr = _.uniq htmlArr
     if @options.exportToArray && type == 'js'
       '<script type="text/javascript">var JT_JS_FILES =' + JSON.stringify(htmlArr) + ';</script>'
     else
