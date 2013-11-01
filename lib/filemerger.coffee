@@ -124,4 +124,7 @@ fileMerger =
             console.error err
     linkFileName
 
-module.exports = fileMerger
+module.exports.convertPath = fileMerger.convertPath
+module.exports.getDefineMergeList = fileMerger.getDefineMergeList
+module.exports.mergeFiles = fileMerger.mergeFiles
+module.exports.mergeFilesToTemp = fileMerger.mergeFilesToTemp

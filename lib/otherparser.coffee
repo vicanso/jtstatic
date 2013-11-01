@@ -49,4 +49,4 @@ otherParser =
               if !isProductionMode
                 throw err
       next()
-module.exports = otherParser
+module.exports.parser = otherParser.parser

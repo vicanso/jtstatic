@@ -53,4 +53,4 @@ mergeFileHandle = (file, cbf) ->
   , cbf
 
 
-module.exports = staticHandler
+module.exports.handler = staticHandler.handler
