@@ -136,7 +136,7 @@ class FileImporter
         @_getExportHTML result, type
     if otherFiles.length
       htmlArr.push mergeFile otherFiles
-    if @options.exportToArray && type == 'js'
+    if @options.exportType == 'array' && type == 'js'
       '<script type="text/javascript">var JT_JS_FILES =' + JSON.stringify(htmlArr) + ';</script>'
     else
       htmlArr.join ''
@@ -172,7 +172,7 @@ class FileImporter
   _exportJsHTML : (file) ->
 
     url = @_getUrl file
-    if @options.exportToArray
+    if @options.exportType == 'array'
       url
     else
       '<script type="text/javascript" src="' + url + '"></script>'
